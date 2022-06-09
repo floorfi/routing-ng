@@ -1,0 +1,5 @@
+<div class="absolute md:top-[20px] md:right-[20px] z-[2] bg-transparent flex flex-col"  v-if="steps.length">
+  <div>
+    <app-stop-list-entry *ngFor="let step of steps" [step]="step"></app-stop-list-entry>
+  </div>
+</div>

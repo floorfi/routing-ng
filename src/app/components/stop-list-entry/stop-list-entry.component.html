@@ -1,0 +1,40 @@
+<div>
+  <div v-if="route" class="flex justify-center w-[300px] ml-[85px] mt-[-5px] p-2 bg-slate-200 flex justify-between">
+    <div>
+      <font-awesome-icon icon="arrow-right-from-bracket" class="mr-[3px]"/><span>{{ route.startTime.format('HH:mm') }}</span>
+    </div>
+    <div>
+      {{ distance }} km
+      <font-awesome-icon icon="car-side" class="mt-[5px] mx-[5px]" />
+      {{ travelTime }} h
+    </div>
+    <div>
+      <font-awesome-icon icon="arrow-right-to-bracket" class="mr-[3px]"/><span>{{ route.endTime.format('HH:mm') }}</span>
+    </div>
+  </div>
+
+  <div class="flex  mt-[-5px]">
+    <div class="w-[80px] mr-[5px] p-2 bg-white rounded-md" >
+      {{ location.arriveTime.format('DD.MM.') }}
+    </div>
+    <div class="relative w-[300px] px-3 py-1 bg-white rounded-md z-100 flex justify-between items-center" @click="modalOpen = true" >
+      <div>{{ currentStep.label }} </div>
+      Ankunft:{{ location.arriveTime.format('HH:mm') }}<br>
+      Abfahrt:{{ location.leaveTime.format('HH:mm') }}
+
+    </div>
+  </div>
+</div>
+
+<t-modal v-model="modalOpen" @confirm="save" @cancel="modalOpen=false">
+  <template v-slot:title>Reiseschritt</template>
+  <div class="space-y-6">
+    <div>
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Name des Schrittes</label>
+      <input type="text" name="label" id="label" v-model="currentStep.label" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>
+    </div>
+  </div>
+  <button @click="removeStep()" class="relative z-10 block rounded-md bg-white p-2 focus:outline-none">
+    <font-awesome-icon icon="times-circle" size="lg" class="'text-slate-600'" /> Entfernen
+  </button>
+</t-modal>
