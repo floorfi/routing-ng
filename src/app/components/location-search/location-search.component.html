@@ -2,7 +2,7 @@
 <div class="relative flex-1 md:min-w-[350px]">
   <!-- Search Input -->
   <input
-    class="pl-9 pr-4 py-3 text-[14px] focus:outline-none w-full shadow-md rounded-md"
+    class="pl-9 pr-4 py-3 focus:outline-none w-full shadow-md rounded-md"
     type="text"
     placeholder="Start your search..."
     [(ngModel)]="searchQuery"
@@ -10,8 +10,8 @@
     (focus)="toggleSearchResults()"
   />
   <!-- Search Icon -->
-  <div class="absolute top-0 left-[8px] h-full flex items-center">
-    <i class="fas fa-search"></i>
+  <div class="absolute top-0 left-[10px] h-full flex items-center">
+    <fa-icon [icon]="['fas', 'search']"></fa-icon>
   </div>
   <!-- Search Results -->
   <div class="absolute mt-[8px] w-full">
@@ -22,6 +22,7 @@
     >
       <!-- Loading Spinner -->
       <app-loader *ngIf="!searchResult"></app-loader>
+
       <!-- Display Results -->
       <div *ngIf="searchResult">
         <div
@@ -29,8 +30,8 @@
           *ngFor="let result of searchResult"
           (click)="selectResult(result)"
         >
-          <i class="fas fa-map-marker-alt"></i>
-          <p class="text-[12px]">{{ result.place_name }}</p>
+          <fa-icon [icon]="['fas', 'location-dot']"></fa-icon>
+          <span class="text-[12px]">{{ result.place_name }}</span>
         </div>
       </div>
     </div>

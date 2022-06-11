@@ -5,7 +5,9 @@
 export const environment = {
   production: false,
 
-  mapApiKey: 'pk.eyJ1IjoiZmxvb3JmaSIsImEiOiJjbDJuYXBqZW4wdmJ4M2lua2F3OTF4NjFjIn0.alPFZ8niF6n98Iky2lEEJg'
+  mapApiKey: 'pk.eyJ1IjoiZmxvb3JmaSIsImEiOiJjbDJuYXBqZW4wdmJ4M2lua2F3OTF4NjFjIn0.alPFZ8niF6n98Iky2lEEJg',
+
+  apiPath: 'http://api'
 };
 
 /*

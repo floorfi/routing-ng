@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {MapboxApiService} from '../../api/mapbox.api.service';
 import {MapboxLocation} from '../../interfaces/mapbox-location.interface';
-import {TravelService} from '../../services/travel.service';
+import {StepService} from '../../services/step.service';
 
 @Component({
   selector: 'app-location-search',
@@ -17,7 +17,7 @@ export class LocationSearchComponent implements OnInit {
 
   constructor(
     private mapboxApiService: MapboxApiService,
-    private travelService: TravelService
+    private stepService: StepService
   ) { }
 
   ngOnInit(): void {
@@ -28,7 +28,6 @@ export class LocationSearchComponent implements OnInit {
   };
 
   search = (): void => {
-    console.log('search')
     if(this.queryTimeout) {
       clearTimeout(this.queryTimeout);
     }
@@ -43,8 +42,8 @@ export class LocationSearchComponent implements OnInit {
     }, 750);
   };
 
-  selectResult = (result: MapboxLocation): void => {
-    this.travelService.addStop(result)
+  selectResult = (selectedLocation: MapboxLocation): void => {
+    this.stepService.addStep(selectedLocation)
   };
 
   closeSearchResults = () => {

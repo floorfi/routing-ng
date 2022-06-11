@@ -2,27 +2,28 @@
   <div class="relative">
     <!-- Modal toggle -->
 
-    <button @click="modalOpen = true" class="relative z-10 block rounded-md bg-white p-2 focus:outline-none">
-      <font-awesome-icon icon="gear" size="lg" class="'text-slate-600'" />
+<!--    <button @click="modalOpen = true" class="relative z-10 block rounded-md bg-white p-2 focus:outline-none">-->
+    <button class="relative z-10 block rounded-md bg-white p-2 focus:outline-none">
+      <fa-icon [icon]="['fas', 'gear']" size="lg" class="'text-slate-600'" ></fa-icon>
     </button>
 
-    <t-modal v-model="modalOpen" @confirm="save">
-      <template v-slot:title>Reiseeinstellungen</template>
-      <div class="space-y-6">
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Name der Reise</label>
-          <input type="text" name="label" id="label" v-model="label" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>
-        </div>
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Maximale Fahrzeit pro Tag</label>
-          <input type="text" name="maxDrivingTime" id="maxDrivingTime" v-model="maxDrivingTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>
-        </div>
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Startzeitpunkt</label>
-          <input type="datetime-local" name="start" id="start" v-model="start" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>
-        </div>
-      </div>
-    </t-modal>
+<!--    <t-modal v-model="modalOpen" @confirm="save">-->
+<!--      <template v-slot:title>Reiseeinstellungen</template>-->
+<!--      <div class="space-y-6">-->
+<!--        <div>-->
+<!--          <label for="label" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Name der Reise</label>-->
+<!--          <input type="text" name="label" id="label" [(ngModel)]="travelConfig.label" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <label for="maxDrivingTime" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Maximale Fahrzeit pro Tag</label>-->
+<!--          <input type="text" name="maxDrivingTime" id="maxDrivingTime" [(ngModel)]="travelConfig.maxDrivingTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <label for="start" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Startzeitpunkt</label>-->
+<!--          <input type="datetime-local" name="start" id="start" [(ngModel)]="travelConfig.start" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </t-modal>-->
 
   </div>
 </div>

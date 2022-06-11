@@ -14,6 +14,14 @@ import { LoaderComponent } from './shared/loader/loader.component';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import { StopListEntryComponent } from './stop-list-entry/stop-list-entry.component';
+import {FaIconLibrary, FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {
+  faArrowRightFromBracket,
+  faArrowRightToBracket,
+  faCarSide,
+  faGear, faLocationDot,
+  faSearch
+} from '@fortawesome/free-solid-svg-icons';
 
 @NgModule({
   declarations: [
@@ -28,13 +36,25 @@ import { StopListEntryComponent } from './stop-list-entry/stop-list-entry.compon
     StopListEntryComponent
   ],
     imports: [
-        BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        FormsModule,
-        HttpClientModule
+      BrowserModule,
+      AppRoutingModule,
+      BrowserAnimationsModule,
+      FormsModule,
+      HttpClientModule,
+      FontAwesomeModule
     ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(
+      faGear,
+      faArrowRightToBracket,
+      faArrowRightFromBracket,
+      faCarSide,
+      faSearch,
+      faLocationDot
+    );
+  }
+}

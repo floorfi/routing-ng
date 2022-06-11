@@ -2,10 +2,8 @@ import {Inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
-import {MapboxLocation} from '../interfaces/mapbox-location.interface';
 import {MapboxRoute} from '../interfaces/mapbox-route.interface';
 import {Coords} from '../interfaces/coords.interface';
-import {GeoRoute} from '../interfaces/route.interface';
 import {MapboxGeocodingResponse} from '../interfaces/mapbox-geocoding-response.interface';
 
 @Injectable({

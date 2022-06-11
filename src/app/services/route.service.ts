@@ -1,24 +1,23 @@
 import { Injectable } from '@angular/core';
-import {GeoRoute} from '../interfaces/route.interface';
+import {Route} from '../classes/route.class';
 import {Coords} from '../interfaces/coords.interface';
-import {GeoLocation} from '../interfaces/location.interface';
+import {Location} from '../classes/location.class';
 import {MapboxApiService} from '../api/mapbox.api.service';
 import {firstValueFrom} from 'rxjs';
 import {MapService} from './map.service';
+import * as moment from 'moment-timezone';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RouteService {
 
-  routes: GeoRoute[] = [];
-
   constructor(
     private mapboxApiService: MapboxApiService,
     private mapService: MapService
   ) { }
 
-  getRouteBetweenLocations = (locationA: GeoLocation, locationB: GeoLocation): Promise<GeoRoute> => {
+  getRouteBetweenLocations = (locationA: Location, locationB: Location): Promise<Route> => {
     const coords: Coords[] = [];
     coords.push(locationA.coords)
     coords.push(locationB.coords)
@@ -28,43 +27,22 @@ export class RouteService {
         .then(response => {
           const data = response!.routes[0];
           const route = data.geometry.coordinates;
-          const geojson = this.mapService.buildFeature('LineString', route);
+          const geojson = this.mapService.buildLineStringFeature(route);
 
           this.mapService.addLayerRoute(locationB.id, geojson)
 
-          const routeStartTime = locationA.leaveTime
-          const routeEndTime = locationA.leaveTime!.add(data.duration, 'seconds')
+          const routeStartTime = moment(locationA.leaveTime)
+          const routeEndTime = moment(locationA.leaveTime).add(data.duration, 'seconds')
 
-          resolve(
-            {
-              id: locationB.id,
-              travelTime: data.duration,
-              waypoints: route,
-              distance: data.distance,
-              startTime: routeStartTime,
-              endTime: routeEndTime
-            }
-          )
+          resolve(new Route(
+            locationB.id,
+            data.duration,
+            data.distance,
+            route,
+            routeStartTime,
+            routeEndTime
+          ))
         });
     })
   }
-
-  addRoute = (route: GeoRoute) => {
-    this.routes.push(route);
-  }
-
-  removeRoute = (id: string) => {
-    this.routes = this.routes.filter((route: GeoRoute) => {
-      return route.id !== id
-    })
-  }
-
-  getRouteByID = (id: string): GeoRoute|undefined => {
-    return this.routes.find(route => route.id === id)
-  }
-
-  reindex = () => {
-    this.routes.filter((route: GeoRoute) => route)
-  }
-
 }

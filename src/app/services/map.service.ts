@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {FeatureCollection} from 'geojson';
+import {Feature, FeatureCollection, Position} from 'geojson';
 import {CircleLayer, GeoJSONSource, LineLayer, Marker, Map} from 'mapbox-gl';
 import {Coords} from '../interfaces/coords.interface';
 import * as mapboxgl from 'mapbox-gl';
@@ -30,7 +30,7 @@ export class MapService {
 
   constructor() { }
 
-  addLayerRoute = (id: string, geojson: FeatureCollection) => {
+  addLayerRoute = (id: string, geojson: Feature) => {
     // if the id already exists on the map, we'll reset it using setData
     if (this.map.getSource(id)) {
       const source: GeoJSONSource = this.map.getSource(id) as GeoJSONSource
@@ -64,7 +64,7 @@ export class MapService {
   }
 
 
-  addLayerPoint = (id: string, coords: Coords): Map => {
+  addLayerPoint = (id: string, coords: Position): Map => {
     const layer: CircleLayer = {
       'id': id,
       'type': 'circle',
@@ -77,22 +77,33 @@ export class MapService {
     return this.map.addLayer(layer);
   }
 
-  buildGeoJsonSource = (coords: Coords): GeoJSONSource => {
+  buildGeoJsonSource = (coords: Position): GeoJSONSource => {
     const featureCollection: FeatureCollection = {
       'type': 'FeatureCollection',
-      'features': [this.buildFeature('Point', coords)]
+      'features': [this.buildPointFeature(coords)]
     }
     return new GeoJSONSource({
       'data': featureCollection
     })
   }
 
-  buildFeature = (type: string, coords: Coords): any => {
+  buildPointFeature = (coords: Position): Feature => {
     return {
       'type': 'Feature',
       'properties': {},
       'geometry': {
-        'type': type,
+        'type': 'Point',
+        'coordinates': coords
+      }
+    }
+  }
+
+  buildLineStringFeature = (coords: Position[]): Feature => {
+    return {
+      'type': 'Feature',
+      'properties': {},
+      'geometry': {
+        'type': 'LineString',
         'coordinates': coords
       }
     }

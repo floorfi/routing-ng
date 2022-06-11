@@ -1,30 +1,29 @@
 import { Injectable } from "@angular/core";
-import { map } from "rxjs/operators";
-import { Store } from "./store";
 import {BehaviorSubject, Observable} from 'rxjs';
-import {StepApiService} from '../api/step.api.service';
 import {Step} from '../classes/step.class';
+import {Location} from '../classes/location.class';
+import {LocationApiService} from '../api/location.api.service';
 
 const timeoutMS: number = 10000; // Nach 10 Sekunden gelten Daten als veraltet und werden beim nächsten Abruf neu geholt
 
-export class StepState {
-  steps: Step[] = [];
+export class LocationState {
+  locations: Location[] = [];
 }
 @Injectable({
   providedIn: 'root'
 })
-export class StepStore {
+export class LocationStore {
 
-  static instance: StepStore
+  static instance: LocationStore
 
-  public steps$ = new BehaviorSubject<Step[]>([]);
+  public locations$ = new BehaviorSubject<Location[]>([]);
   private cacheTimeout: boolean = false;
 
-  constructor(private stepApiService: StepApiService) {
-    StepStore.instance = this
+  constructor(private locationApiService: LocationApiService) {
+    LocationStore.instance = this
 
-    this.steps$.subscribe(e => {
-      console.group('Step Store')
+    this.locations$.subscribe(e => {
+      console.group('Location Store')
       console.log(e)
       console.groupEnd()
     })
@@ -52,27 +51,9 @@ export class StepStore {
   //   })
   // }
   //
-  // public getUserById(id: string): Promise<User> {
-  //   return new Promise(resolve => {
-  //     // User im store zu finden?
-  //     let user = this.state.users.find(stateUser => stateUser.id === id);
-  //     if(user) {
-  //       resolve(user);
-  //     }
-  //     // Nicht im Store - via API suchen
-  //     else {
-  //       this.userApi.getUserById(id).subscribe(user => {
-  //         this.state.users.push(user);
-  //         this.setState({
-  //           ...this.state,
-  //           users: this.state.users,
-  //         });
-  //
-  //         resolve(user);
-  //       })
-  //     }
-  //   })
-  // }
+  public getLocationById(id: string): Location|undefined {
+      return this.locations$.value.find(stateLocation => stateLocation.id === id);
+  }
   //
   // public updateUser(user: User): Promise<User> {
   //   return new Promise(resolve => {
@@ -98,24 +79,24 @@ export class StepStore {
   //   })
   // }
 
-  public createStep(step: Step): Promise<Step> {
+  public createLocation(location: Location): Promise<Location> {
     return new Promise(resolve => {
-      this.stepApiService.createStep(step).subscribe(createdStep => {
-        const newState = this.steps$.value
-        newState.push(createdStep)
-        this.steps$.next(newState);
-        resolve(step);
+      this.locationApiService.createLocation(location).subscribe(createdLocation => {
+        const newState = this.locations$.value
+        newState.push(createdLocation)
+        this.locations$.next(newState);
+        resolve(location);
       })
     })
   }
 
-  public deleteStep(step: Step): Promise<Step> {
+  public deleteLocation(location: Location): Promise<Location> {
     return new Promise(resolve => {
-      this.stepApiService.deleteStep(step).subscribe(() => {
-        const newState = this.steps$.value.filter(stateStep => stateStep.id !== step.id);
-        this.steps$.next(newState);
+      this.locationApiService.deleteLocation(location).subscribe(() => {
+        const newState = this.locations$.value.filter(stateLocation => stateLocation.id !== location.id);
+        this.locations$.next(newState);
 
-        resolve(step);
+        resolve(location);
       })
     })
   }

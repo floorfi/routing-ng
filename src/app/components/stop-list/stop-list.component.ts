@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {StepService} from '../../services/step.service';
-import {Step} from '../../interfaces/step.interface';
+import {Step} from '../../classes/step.class';
+import {StepStore} from '../../store/step.store';
 
 @Component({
   selector: 'app-stop-list',
@@ -12,11 +13,14 @@ export class StopListComponent implements OnInit {
   steps: Step[] = [];
 
   constructor(
-    private stepService: StepService
+    private stepService: StepService,
+    private stepStore: StepStore
   ) { }
 
   ngOnInit(): void {
-    this.steps = this.stepService.steps
+    this.stepStore.steps$.subscribe(steps => {
+      this.steps = steps
+    })
   }
 
 }
