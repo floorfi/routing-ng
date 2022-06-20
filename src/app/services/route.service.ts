@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
+import * as moment from 'moment-timezone';
+import {firstValueFrom} from 'rxjs';
+import {MapboxApiService} from '../api/mapbox.api.service';
+import {Location} from '../classes/location.class';
 import {Route} from '../classes/route.class';
 import {Coords} from '../interfaces/coords.interface';
-import {Location} from '../classes/location.class';
-import {MapboxApiService} from '../api/mapbox.api.service';
-import {firstValueFrom} from 'rxjs';
 import {MapService} from './map.service';
-import * as moment from 'moment-timezone';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,7 @@ export class RouteService {
   ) { }
 
   getRouteBetweenLocations = (locationA: Location, locationB: Location): Promise<Route> => {
+    console.log('Calculate route');
     const coords: Coords[] = [];
     coords.push(locationA.coords)
     coords.push(locationB.coords)

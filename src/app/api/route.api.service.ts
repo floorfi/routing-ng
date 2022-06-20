@@ -1,5 +1,5 @@
-import {Inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Route} from '../classes/route.class';
@@ -24,7 +24,12 @@ export class RouteApiService {
   // }
 
   createRoute(route: Route): Observable<Route> {
-    return new Observable<Route>(subscriber => subscriber.next(route))
+    return new Observable<Route>(subscriber => subscriber.next(route));
+    // return this.httpClient.post<Route>(this.routeUrl, route);
+  }
+
+  updateRoute(route: Route): Observable<Route> {
+    return new Observable<Route>(subscriber => subscriber.next(route));
     // return this.httpClient.post<Route>(this.routeUrl, route);
   }
 
@@ -33,7 +38,7 @@ export class RouteApiService {
   // }
 
   deleteRoute(route: Route): Observable<Route> {
-    return new Observable<Route>(subscriber => subscriber.next(route))
+    return new Observable<Route>(subscriber => subscriber.next(route));
     // return this.httpClient.delete<Route>(this.routeUrl + '/' + route.id);
   }
 }

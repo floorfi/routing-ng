@@ -1,14 +1,14 @@
-import { Injectable } from "@angular/core";
-import {BehaviorSubject, Observable} from 'rxjs';
-import {Step} from '../classes/step.class';
-import {Location} from '../classes/location.class';
+import {Injectable} from "@angular/core";
+import {BehaviorSubject} from 'rxjs';
 import {LocationApiService} from '../api/location.api.service';
+import {Location} from '../classes/location.class';
 
 const timeoutMS: number = 10000; // Nach 10 Sekunden gelten Daten als veraltet und werden beim nächsten Abruf neu geholt
 
 export class LocationState {
   locations: Location[] = [];
 }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -51,42 +51,40 @@ export class LocationStore {
   //   })
   // }
   //
-  public getLocationById(id: string): Location|undefined {
-      return this.locations$.value.find(stateLocation => stateLocation.id === id);
+  public getLocationById(id: string): Location | undefined {
+    let location = this.locations$.getValue().find(stateLocation => stateLocation.id === id);
+    if (location) location = Object.create(location);
+
+    return location;
   }
-  //
-  // public updateUser(user: User): Promise<User> {
-  //   return new Promise(resolve => {
-  //     // User via API updaten
-  //     this.userApi.updateUser(user).subscribe(updatedUser => {
-  //       // Ist User schon im Store?
-  //       let user = this.state.users.find(stateUser => stateUser.id === updatedUser.id);
-  //       // User ist im store -> aktualisieren
-  //       if(user) {
-  //         user = updatedUser;
-  //       }
-  //       // User ist nicht im store -> hinzufügen
-  //       else {
-  //         this.state.users.push(updatedUser);
-  //         this.setState({
-  //           ...this.state,
-  //           users: this.state.users
-  //         });
-  //       }
-  //
-  //       resolve(updatedUser);
-  //     })
-  //   })
-  // }
+
+
+  public updateLocation(location: Location): Promise<Location> {
+    return new Promise(resolve => {
+
+      this.locationApiService.updateLocation(location).subscribe(updatedLocation => {
+        const location = this.locations$.value.find(stateLocation => stateLocation.id === updatedLocation.id)!;
+        const index = this.locations$.value.indexOf(location);
+
+        const newState = this.locations$.value;
+        newState[index] = updatedLocation;
+
+        this.locations$.next(newState);
+
+        resolve(updatedLocation);
+      });
+    });
+  }
+
 
   public createLocation(location: Location): Promise<Location> {
     return new Promise(resolve => {
       this.locationApiService.createLocation(location).subscribe(createdLocation => {
-        const newState = this.locations$.value
-        newState.push(createdLocation)
+        const newState = this.locations$.value;
+        newState.push(createdLocation);
         this.locations$.next(newState);
         resolve(location);
-      })
+      });
     })
   }
 

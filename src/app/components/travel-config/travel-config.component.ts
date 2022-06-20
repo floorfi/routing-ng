@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import {TravelConfigService} from '../../services/travelConfig.service';
-import {TravelConfig} from '../../interfaces/travelConfig.interface';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import * as moment from 'moment-timezone';
+import {Travel} from '../../classes/travel.class';
+import {TravelStore} from '../../store/travel.store';
+import {CustomModalService} from '../shared/custom-modal/custom-modal.service';
 
 @Component({
   selector: 'app-travel-config',
@@ -10,26 +11,54 @@ import * as moment from 'moment-timezone';
 })
 export class TravelConfigComponent implements OnInit {
 
-  travelConfig: TravelConfig;
+  travel?: Travel;
+  @ViewChild('modalContent') modalContent!: ElementRef;
 
   constructor(
-    private travelConfigService: TravelConfigService
+    private travelStore: TravelStore,
+    private customModalService: CustomModalService
   ) {
-    this.travelConfig = travelConfigService.config
   }
 
   ngOnInit(): void {
   }
 
-  save = () => {
-    console.log('save')
-
-    const configToSave = {...this.travelConfigService.config}
-    configToSave.label = this.travelConfig.label
-    // configToSave.maxDrivingTime = moment(this.travelConfig.maxDrivingTime, 'HH:mm').format('X')
-    // configToSave.start = moment(this.travelConfig.start, 'YYYY-MM-DDTHH:mm').tz(moment.tz.guess())
-    // travelConfigService.saveConfig(configToSave)
-    // modalOpen.value = false
+  // Getter+Setter für Typenumwandlung String <--> Moment
+  get maxDrivingTime() {
+    return moment.utc(this.travel!.maxDrivingTime.asMilliseconds()).format("HH:mm");
   }
+
+  set maxDrivingTime(dateTime: string) {
+    this.travel!.maxDrivingTime = moment.duration(dateTime);
+  }
+
+  get startMoment() {
+    return this.travel!.start.format('YYYY-MM-DDTHH:mm');
+  }
+
+  set startMoment(dateTime: string) {
+    this.travel!.start = moment(dateTime);
+  }
+
+  openModal = () => {
+    this.travel = this.travelStore.getTravelById('black')!;
+
+    const modalRef = this.customModalService.open(
+      {
+        title: 'Reiseeinstellungen',
+        component: this.modalContent
+      }
+    );
+
+    modalRef.buttonEvent.subscribe(() => {
+      this.save();
+      modalRef.close();
+    });
+  };
+
+  save = () => {
+    TravelStore.instance.updateTravel(this.travel!);
+    TravelStore.instance.currentTravel = this.travel;
+  };
 
 }

@@ -1,5 +1,5 @@
-import {Coords} from '../interfaces/coords.interface';
 import {Moment} from 'moment';
+import {Coords} from '../interfaces/coords.interface';
 import {RouteStore} from '../store/route.store';
 
 export class Route {
@@ -19,17 +19,25 @@ export class Route {
     startTime: Moment,
     endTime: Moment
   ) {
-    this.id = id
-    this.travelTime = travelTime
-    this.distance = distance
-    this.waypoints = waypoints
-    this.startTime = startTime
-    this.endTime = endTime
+    this.id = id;
+    this.travelTime = travelTime;
+    this.distance = distance;
+    this.waypoints = waypoints;
+    this.startTime = startTime;
+    this.endTime = endTime;
   }
 
   save = (): void => {
-    RouteStore.instance.createRoute(this);
-  }
+    if (RouteStore.instance.getRouteById(this.id)) {
+      RouteStore.instance.updateRoute(this);
+    } else {
+      RouteStore.instance.createRoute(this);
+    }
+  };
+
+  delete = (): void => {
+    RouteStore.instance.deleteRoute(this);
+  };
 
 
 }

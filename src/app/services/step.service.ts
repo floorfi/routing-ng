@@ -1,24 +1,24 @@
-import { Injectable } from '@angular/core';
-import {Step} from '../classes/step.class';
-import {StepStore} from '../store/step.store';
-import {MapboxLocation} from '../interfaces/mapbox-location.interface';
+import {Injectable} from '@angular/core';
 import {Location} from '../classes/location.class';
 import {Route} from '../classes/route.class';
-import {TravelConfigService} from './travelConfig.service';
+import {Step} from '../classes/step.class';
+import {MapboxLocation} from '../interfaces/mapbox-location.interface';
 import {LocationStore} from '../store/location.store';
-import {RouteService} from './route.service';
-import {MapService} from './map.service';
 import {RouteStore} from '../store/route.store';
+import {StepStore} from '../store/step.store';
+import {TravelStore} from '../store/travel.store';
+import {MapService} from './map.service';
+import {RouteService} from './route.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StepService {
 
-  static instance: StepService
+  static instance: StepService;
 
   constructor(
-    private travelConfigService: TravelConfigService,
+    private travelStore: TravelStore,
     private stepStore: StepStore,
     private locationStore: LocationStore,
     private routeService: RouteService,
@@ -39,8 +39,8 @@ export class StepService {
       result.text_de,
       coords,
       marker,
-      this.travelConfigService.config.start,
-      this.travelConfigService.config.start
+      this.travelStore.currentTravel!.start,
+      this.travelStore.currentTravel!.start
     )
 
     // Neuen Step anlegen
@@ -50,67 +50,79 @@ export class StepService {
     )
 
     // Ggf. vorhandenen vorherigen Step holen
-    const previousStep = step.getPreviousStep()
+    const previousStep = step.previousStep;
 
     // Wenn es eine vorhergehende Location gibt: Route berechnen
-    if(previousStep) {
-      const previousLocation = this.locationStore.getLocationById(previousStep.id)!
+    if (previousStep) {
+      const previousLocation = this.locationStore.getLocationById(previousStep.id)!;
       this.routeService.getRouteBetweenLocations(previousLocation, location).then((route: Route) => {
-        route.save()
+        route.save();
 
-        location.arriveTime = route.endTime
-        location.leaveTime = route.endTime
-      })
+        location.arriveTime = route.endTime;
+        location.leaveTime = route.endTime;
+      });
     }
 
-    step.save()
-    location.save()
+    step.save();
+    location.save();
 
-    console.groupEnd()
+    console.groupEnd();
   };
 
 
-  removeStep = (stepID: string) => {
-    // const stepToRemove: Step = this.stepService.steps.find((step: Step) => step.id === stepID)!;
-    // const indexToRemove: number = this.stepService.steps.findIndex((step: Step) => step.id === stepID);
-    // let previousStep: Step|null = null;
-    // let followingStep: Step|null = null;
-    //
-    // // Vorherige routeTo entfernen
-    // this.routeService.removeRoute(stepID);
-    // this.mapService.removeLayer(stepID);
-    //
-    // // Gibt es einen vorherigen Step?
-    // if(this.stepService.steps[indexToRemove-1]) {
-    //   previousStep = this.stepService.steps[indexToRemove-1];
-    // }
-    //
-    // // Gibt es einen Folgestep?
-    // if(this.stepService.steps[indexToRemove+1]) {
-    //   followingStep = this.stepService.steps[indexToRemove+1];
-    //   this.routeService.removeRoute(followingStep!.id);
-    //   this.mapService.removeLayer(followingStep!.id);
-    // }
-    //
-    // // Recalculate route (if more than one step left)
-    // if(previousStep && followingStep){
-    //   const previousLocation = this.locationService.getlocationByID(previousStep.id)!
-    //   const followingLocation = this.locationService.getlocationByID(followingStep.id)!
-    //   this.routeService.getRouteBetweenLocations(previousLocation, followingLocation).then((route: GeoRoute) => {
-    //     this.routeService.addRoute(route);
-    //   })
-    // }
-    //
-    // // Remove objects
-    // const locationToRemove = this.locationService.getlocationByID(stepToRemove.id)
-    // this.mapService.removeMarker(locationToRemove!.marker)
-    // this.locationService.removeLocation(stepID);
-    // this.stepStore.deleteStep(stepToRemove);
-    //
-    //
-    // // Reindex arrays
-    // this.locationService.reindex()
-    // this.routeService.reindex()
+  removeStep = (stepId: string) => {
+    const stepToRemove = this.stepStore.getStepById(stepId)!;
+
+    let previousStep = stepToRemove.previousStep;
+    let followingStep = stepToRemove.followingStep;
+
+    // Ggf. vorherige route entfernen
+    if (previousStep) {
+      const routeToRemove = this.routeStore.getRouteById(stepId)!;
+      routeToRemove.delete();
+      this.mapService.removeLayer(stepId);
+    }
+
+    // Location und step entfernen
+    const locationToRemove = this.locationStore.getLocationById(stepToRemove.id)!;
+    this.mapService.removeMarker(locationToRemove!.marker);
+    locationToRemove.delete();
+    stepToRemove.delete();
+
+
+    // Gibt es einen Folgestep?
+    if (followingStep) {
+      // Alte Route löschen
+      const routeToRemove = this.routeStore.getRouteById(followingStep.id)!;
+      routeToRemove.delete();
+      this.mapService.removeLayer(followingStep.id);
+
+      // orderIDs der folgenden Steps anpassen
+      this.stepStore.steps$.value.forEach(step => {
+        if (step.orderId >= followingStep!.orderId) {
+          step.orderId = step.orderId - 1;
+          step.save();
+        }
+      });
+    }
+
+    // Route neu berechnen (wenn es vorherige und folgende Route gibt)
+    if (previousStep && followingStep) {
+      const previousLocation = this.locationStore.getLocationById(previousStep.id)!;
+      const followingLocation = this.locationStore.getLocationById(followingStep.id)!;
+      this.routeService.getRouteBetweenLocations(previousLocation, followingLocation).then(route => {
+        route.save();
+
+        followingLocation.arriveTime = route.endTime;
+        followingLocation.leaveTime = route.endTime;
+      });
+
+      followingLocation.save();
+    }
   };
 
+
+  recalculateTimes = () => {
+
+  };
 }

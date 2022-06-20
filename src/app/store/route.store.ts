@@ -1,16 +1,14 @@
-import { Injectable } from "@angular/core";
-import { map } from "rxjs/operators";
-import { Store } from "./store";
-import {BehaviorSubject, Observable} from 'rxjs';
+import {Injectable} from "@angular/core";
+import {BehaviorSubject} from 'rxjs';
 import {RouteApiService} from '../api/route.api.service';
 import {Route} from '../classes/route.class';
-import {Location} from '../classes/location.class';
 
 const timeoutMS: number = 10000; // Nach 10 Sekunden gelten Daten als veraltet und werden beim nächsten Abruf neu geholt
 
 export class RouteState {
   routes: Route[] = [];
 }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -53,43 +51,42 @@ export class RouteStore {
   //   })
   // }
   //
-  public getRouteById(id: string): Route|undefined {
-    return this.routes$.value.find(stateRoute => stateRoute.id === id);
+  public getRouteById(id: string): Route | undefined {
+    let route = this.routes$.value.find(stateRoute => stateRoute.id === id);
+    if (route) route = Object.create(route);
+
+    return route;
   }
-  //
-  // public updateUser(user: User): Promise<User> {
-  //   return new Promise(resolve => {
-  //     // User via API updaten
-  //     this.userApi.updateUser(user).subscribe(updatedUser => {
-  //       // Ist User schon im Store?
-  //       let user = this.state.users.find(stateUser => stateUser.id === updatedUser.id);
-  //       // User ist im store -> aktualisieren
-  //       if(user) {
-  //         user = updatedUser;
-  //       }
-  //       // User ist nicht im store -> hinzufügen
-  //       else {
-  //         this.state.users.push(updatedUser);
-  //         this.setState({
-  //           ...this.state,
-  //           users: this.state.users
-  //         });
-  //       }
-  //
-  //       resolve(updatedUser);
-  //     })
-  //   })
-  // }
+
+
+  public updateRoute(route: Route): Promise<Route> {
+    return new Promise(resolve => {
+
+      this.routeApiService.updateRoute(route).subscribe(updatedRoute => {
+        const route = this.routes$.value.find(stateRoute => stateRoute.id === updatedRoute.id)!;
+        const index = this.routes$.value.indexOf(route);
+
+        const newState = this.routes$.value;
+        newState[index] = updatedRoute;
+
+        this.routes$.next(newState);
+
+        resolve(updatedRoute);
+      });
+    });
+  }
+
 
   public createRoute(route: Route): Promise<Route> {
     return new Promise(resolve => {
-      this.routeApiService.createRoute(route).subscribe(createdRoute => {    console.log('save route')
-        const newState = this.routes$.value
-        newState.push(createdRoute)
+      this.routeApiService.createRoute(route).subscribe(createdRoute => {
+        console.log('save route');
+        const newState = this.routes$.value;
+        newState.push(createdRoute);
         this.routes$.next(newState);
         resolve(route);
-      })
-    })
+      });
+    });
   }
 
   public deleteRoute(route: Route): Promise<Route> {

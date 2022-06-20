@@ -1,5 +1,5 @@
-import {Inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../environments/environment';
 import {Location} from '../classes/location.class';
@@ -24,16 +24,19 @@ export class LocationApiService {
   // }
 
   createLocation(location: Location): Observable<Location> {
-    return new Observable<Location>(subscriber => subscriber.next(location))
+    return new Observable<Location>(subscriber => subscriber.next(location));
     // return this.httpClient.post<Location>(this.userUrl, location);
   }
 
-  // updateUser(location: Location): Observable<Location> {
-  //   return this.httpClient.put<Location>(this.userUrl + '/' + location.id, location);
-  // }
+
+  updateLocation(location: Location): Observable<Location> {
+    return new Observable<Location>(subscriber => subscriber.next(location));
+    // return this.httpClient.post<Location>(this.userUrl, location);
+  }
+
 
   deleteLocation(location: Location): Observable<Location> {
-    return new Observable<Location>(subscriber => subscriber.next(location))
+    return new Observable<Location>(subscriber => subscriber.next(location));
     // return this.httpClient.delete<Location>(this.userUrl + '/' + location.id);
   }
 }
