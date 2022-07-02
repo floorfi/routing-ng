@@ -26,21 +26,24 @@
       <ng-container *ngIf="data.message">
         {{ data.message }}
       </ng-container>
-      <ng-container *ngTemplateOutlet="data.component"></ng-container>
+      <ng-container *ngTemplateOutlet="data.contentComponent"></ng-container>
     </div>
   </mat-dialog-content>
 
-  <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
-    <app-t-button (click)="confirm()"
-                  color="blue"
-                  data-modal-toggle="defaultModal"
-    >Speichern
-    </app-t-button>
-    <app-t-button (click)="close()"
-                  color="gray"
-                  data-modal-toggle="defaultModal"
-    >Abbrechen
-    </app-t-button>
+  <div class="flex justify-between items-center p-6 rounded-b border-t border-gray-200 dark:border-gray-600">
+    <div class="space-x-2">
+      <app-t-button (click)="confirm()"
+                    color="blue"
+                    data-modal-toggle="defaultModal"
+      >Speichern
+      </app-t-button>
+      <app-t-button (click)="close()"
+                    color="gray"
+                    data-modal-toggle="defaultModal"
+      >Abbrechen
+      </app-t-button>
+    </div>
+    <ng-container *ngTemplateOutlet="data.footerComponent"></ng-container>
   </div>
 
 </div>

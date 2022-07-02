@@ -1,28 +1,27 @@
+import {RouteService} from '../services/route.service';
+import {StepService} from '../services/step.service';
 import {StepStore} from '../store/step.store';
+import {TravelStore} from '../store/travel.store';
+import {Location} from './location.class';
+import {Route} from './route.class';
 
 export class Step {
 
   id: string;
   label: string;
-  nights: number;
   orderId: number;
+  location: Location;
 
   constructor(
     id: string,
-    label: string
+    label: string,
+    location: Location,
+    orderId: number,
   ) {
-
-    console.log('Next orderId: ' + this.nextOrderID);
-
     this.id = id;
     this.label = label;
-    this.nights = 0;
-    this.orderId = this.nextOrderID;
-  }
-
-  get nextOrderID(): number {
-    if (StepStore.instance.steps$.value.length === 0) return 0;
-    return StepStore.instance.steps$.value.reduce((prev, curr) => prev.orderId < curr.orderId ? curr : prev).orderId + 1;
+    this.orderId = orderId;
+    this.location = location;
   }
 
   get previousStep(): Step | null {
@@ -30,10 +29,53 @@ export class Step {
     return StepStore.instance.steps$.value.find(step => step.orderId === this.orderId - 1)!;
   }
 
+
   get followingStep(): Step | null {
     const followingStep = StepStore.instance.steps$.value.find(step => step.orderId === this.orderId + 1);
     return followingStep ? followingStep : null;
   }
+
+
+  buildRouteTo = (): Promise<true> => {
+    if (this.location && this.previousStep) {
+      return new Promise<true>(resolve => {
+        console.log('Build route to step');
+
+        // Alle items von vorherigem bis zu diesem Step löschen
+        StepService.instance.deleteEntriesBeforeStep(this);
+
+
+        let previousLocation = this.previousStep?.location!;
+
+        // Es wird eine sehr detailierte Route geholt, um die Zwischenstops berechnen zu können
+        RouteService.instance.getRouteBetweenLocations(previousLocation, this.location!, true).then((route: Route) => {
+
+          // Route zu lang? Zwischenstops einbauen!
+          if (route.travelTime > TravelStore.instance.currentTravel!.maxDrivingTime) {
+            console.log('Route too long');
+            console.group('Add auto stops');
+            RouteService.instance.addAutoStops(previousLocation, this.location!, route).then(() => {
+              resolve(true);
+              console.groupEnd();
+            });
+          }
+          // Route so okay -> speichern
+          else {
+            // TODO: Es wurde eine Komplexe Route geholt, diese noch vereinfachen: https://mourner.github.io/simplify-js/
+
+            route.save();
+            this.location!.arriveTime = route.endTime;
+            this.location!.leaveTime = route.endTime;
+            this.location!.save();
+            resolve(true);
+          }
+        });
+      });
+    }
+
+    return Promise.resolve(true);
+  };
+
 
   save = (): void => {
     if (StepStore.instance.getStepById(this.id)) {
@@ -43,7 +85,16 @@ export class Step {
     }
   };
 
+
   delete = (): void => {
-    StepStore.instance.createStep(this);
+    StepStore.instance.deleteStep(this);
+
+    // orderIDs der folgenden Steps anpassen
+    StepStore.instance.steps$.value.forEach(step => {
+      if (step.orderId >= this.orderId) {
+        step.orderId = step.orderId - 1;
+        step.save();
+      }
+    });
   };
 }

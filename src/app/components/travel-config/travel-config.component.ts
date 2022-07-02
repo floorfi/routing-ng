@@ -46,7 +46,7 @@ export class TravelConfigComponent implements OnInit {
     const modalRef = this.customModalService.open(
       {
         title: 'Reiseeinstellungen',
-        component: this.modalContent
+        contentComponent: this.modalContent
       }
     );
 

@@ -49,7 +49,6 @@ body {
 @import '~mapbox-gl/dist/mapbox-gl.css';
 @import "~mapbox-gl-style-switcher/styles.css";
 
-
 mat-dialog-container.mat-dialog-container {
   padding: 0;
   background: transparent;
@@ -58,4 +57,10 @@ mat-dialog-container.mat-dialog-container {
   h2 {
     margin: 0;
   }
+}
+
+
+.mapboxgl-marker .fa-stack-1x {
+  font-size: 1rem;
+  margin-top: -7px;
 }

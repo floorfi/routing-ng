@@ -5,9 +5,10 @@ import {CustomModalDirective} from "./custom-modal.directive";
 export interface CustomModalConfig {
   title: string;
   message?: string;
-  component?: any;
+  contentComponent?: any;
   inputs?: any;
   type?: string;
+  footerComponent?: any;
 }
 
 @Component({
@@ -29,8 +30,6 @@ export class CustomModalComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.data.component) {
-    }
   }
 
   public close() {

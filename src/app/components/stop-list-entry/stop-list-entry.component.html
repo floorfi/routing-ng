@@ -6,34 +6,168 @@
     </div>
     <div>
       {{ distance }} km
-      <fa-icon [icon]="['fas', 'car-side']" class="mt-[5px] mx-[5px]"></fa-icon>
+      <fa-icon [icon]="['fas', 'car-side']"
+               class="mt-[5px] mx-[5px]"
+      ></fa-icon>
       {{ travelTime }} h
     </div>
     <div>
-      <fa-icon [icon]="['fas', 'arrow-right-to-bracket']" class="mr-[3px]" ></fa-icon>
+      <fa-icon [icon]="['fas', 'arrow-right-to-bracket']"
+               class="mr-[3px]"
+      ></fa-icon>
       <span *ngIf="route.endTime">{{ route.endTime.format('HH:mm') }}</span>
     </div>
   </div>
 
-  <div class="flex  mt-[-5px]">
-    <div class="w-[80px] mr-[5px] p-2 bg-white rounded-md" >
+  <div class="flex mt-[-5px]">
+    <div class="w-[80px] mr-[5px] p-2 bg-white rounded-md">
       <span *ngIf="location.arriveTime">{{ location.arriveTime.format('DD.MM.') }}</span>
     </div>
-    <div class="relative w-[300px] px-3 py-1 bg-white rounded-md z-100 flex justify-between items-center">
-      <div>{{ step.label }} </div>
+
+    <div
+        (click)="openModal()"
+        (mouseenter)="togglePinHover()"
+        (mouseleave)="togglePinHover()"
+        [ngClass]="{'bg-red-100': !step}"
+        class="relative w-[300px] px-3 py-1 bg-white rounded-md z-100 flex justify-between items-center cursor-pointer border border-transparent hover:bg-slate-600 hover:text-white"
+    >
+      <div *ngIf="step">{{ step.label }} </div>
     </div>
   </div>
 </div>
 
-<!--<t-modal v-model="modalOpen" @confirm="save" @cancel="modalOpen=false">-->
-<!--  <template v-slot:title>Reiseschritt</template>-->
-<!--  <div class="space-y-6">-->
-<!--    <div>-->
-<!--      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Name des Schrittes</label>-->
-<!--      <input type="text" name="label" id="label" v-model="currentStep.label" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com" required>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <button (click)="removeStep()" class="relative z-10 block rounded-md bg-white p-2 focus:outline-none">-->
-<!--    <fa-icon [icon]="['fas', 'times-circle']" size="lg" class="'text-slate-600'" ></fa-icon> Entfernen-->
-<!--  </button>-->
-<!--</t-modal>-->
+<ng-template #modalContent>
+  <div class="space-y-6">
+
+    <div *ngIf="step">
+      <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+             for="label"
+      >Name des Schrittes
+      </label>
+      <input [(ngModel)]="step.label"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+             id="label"
+             name="label"
+             placeholder="name@company.com"
+             required
+             type="text"
+      >
+    </div>
+
+    <div>
+      <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+             for="locationName"
+      >Ort
+      </label>
+      <input [(ngModel)]="location.locationName"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+             id="locationName"
+             name="locationName"
+             placeholder="name@company.com"
+             required
+             type="text"
+      >
+    </div>
+
+    <div class="flex flex-wrap -mx-3 mb-6">
+      <div class="w-full md:w-1/2 px-3">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+               for="lon"
+        >Longitude
+        </label>
+        <input [(ngModel)]="location.coords[0]"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+               id="lon"
+               name="lon"
+               placeholder="name@company.com"
+               required
+               type="text"
+        >
+      </div>
+      <div class="w-full md:w-1/2 px-3">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+               for="lat"
+        >Latitude
+        </label>
+        <input [(ngModel)]="location.coords[1]"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+               id="lat"
+               name="lat"
+               placeholder="name@company.com"
+               required
+               type="text"
+        >
+      </div>
+    </div>
+
+    <div class="flex flex-wrap -mx-3 mb-6">
+      <div class="w-full md:w-1/2 px-3">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+               for="arriveTime"
+        >Ankunftszeit
+        </label>
+        <input [(ngModel)]="arrivalMoment"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+               id="arriveTime"
+               name="arriveTime"
+               placeholder="name@company.com"
+               required
+               type="datetime-local"
+        >
+      </div>
+      <div class="w-full md:w-1/2 px-3">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+               for="leaveTime"
+        >Abfahrtszeit
+        </label>
+        <input [(ngModel)]="leaveMoment"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+               id="leaveTime"
+               name="leaveTime"
+               placeholder="name@company.com"
+               required
+               type="datetime-local"
+        >
+      </div>
+    </div>
+
+    <div class="flex flex-wrap -mx-3 mb-6">
+      <div class="w-full md:w-3/4 px-3">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+               for="icon"
+        >Pin-Icon
+        </label>
+        <input [(ngModel)]="location.pin.icon"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+               id="icon"
+               name="icon"
+               placeholder="name@company.com"
+               required
+               type="text"
+        >
+      </div>
+      <div class="w-full md:w-1/4 px-3">
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+               for="color"
+        >Pin-Farbe
+        </label>
+        <input [(ngModel)]="location.pin.color"
+               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+               id="color"
+               name="color"
+               placeholder="name@company.com"
+               required
+               type="color"
+        >
+      </div>
+    </div>
+
+  </div>
+</ng-template>
+<ng-template #modalFooter>
+  <app-t-button (click)="removeStep()"
+                color="red"
+                data-modal-toggle="defaultModal"
+  >Löschen
+  </app-t-button>
+</ng-template>

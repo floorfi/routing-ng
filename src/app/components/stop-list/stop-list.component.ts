@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {StepService} from '../../services/step.service';
-import {Step} from '../../classes/step.class';
-import {StepStore} from '../../store/step.store';
+import {Component, OnInit} from '@angular/core';
+import {Location} from '../../classes/location.class';
+import {LocationStore} from '../../store/location.store';
 
 @Component({
   selector: 'app-stop-list',
@@ -10,17 +9,16 @@ import {StepStore} from '../../store/step.store';
 })
 export class StopListComponent implements OnInit {
 
-  steps: Step[] = [];
+  locations: Location[] = [];
 
   constructor(
-    private stepService: StepService,
-    private stepStore: StepStore
+    private locationStore: LocationStore
   ) { }
 
   ngOnInit(): void {
-    this.stepStore.steps$.subscribe(steps => {
-      this.steps = steps
-    })
+    this.locationStore.locations$.subscribe(locations => {
+      this.locations = locations.sort((a, b) => a.orderId > b.orderId ? 1 : -1);
+    });
   }
 
 }
