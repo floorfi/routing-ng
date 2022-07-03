@@ -2,7 +2,7 @@
   <div *ngIf="route" class="flex justify-center w-[300px] ml-[85px] mt-[-5px] p-2 bg-slate-200 flex justify-between">
     <div>
       <fa-icon [icon]="['fas', 'arrow-right-from-bracket']" class="mr-[3px]" ></fa-icon>
-      <span *ngIf="route.startTime">{{ route.startTime.format('HH:mm') }}</span>
+      <span>{{ location.previousLocation!.leaveTime.format('HH:mm') }}</span>
     </div>
     <div>
       {{ distance }} km
@@ -15,7 +15,7 @@
       <fa-icon [icon]="['fas', 'arrow-right-to-bracket']"
                class="mr-[3px]"
       ></fa-icon>
-      <span *ngIf="route.endTime">{{ route.endTime.format('HH:mm') }}</span>
+      <span>{{ location.arriveTime.format('HH:mm') }}</span>
     </div>
   </div>
 

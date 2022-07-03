@@ -33,16 +33,12 @@ export class RouteService {
       firstValueFrom(this.mapboxApiService.getRoute(coords, fullPath))
         .then(response => {
           const data = response!.routes[0];
-          const routeStartTime = moment(locationA.leaveTime);
-          const routeEndTime = moment(locationA.leaveTime).add(data.duration, 'seconds')
 
           resolve(new Route(
             locationB.id,
             moment.duration(data.duration, 'seconds'),
             data.distance,
-            data.geometry,
-            routeStartTime,
-            routeEndTime
+            data.geometry
           ))
         });
     })

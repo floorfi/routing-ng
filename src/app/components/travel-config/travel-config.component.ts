@@ -32,6 +32,14 @@ export class TravelConfigComponent implements OnInit {
     this.travel!.maxDrivingTime = moment.duration(dateTime);
   }
 
+  get standardLocationDuration() {
+    return moment.utc(this.travel!.standardLocationDuration.asMilliseconds()).format("HH:mm");
+  }
+
+  set standardLocationDuration(dateTime: string) {
+    this.travel!.standardLocationDuration = moment.duration(dateTime);
+  }
+
   get startMoment() {
     return this.travel!.start.format('YYYY-MM-DDTHH:mm');
   }

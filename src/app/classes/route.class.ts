@@ -13,23 +13,17 @@ export class Route {
   travelTime: Duration;
   distance: number;
   waypoints: LineString;
-  startTime: Moment;
-  endTime: Moment;
 
   constructor(
     id: string,
     travelTime: Duration,
     distance: number,
-    waypoints: LineString,
-    startTime: Moment,
-    endTime: Moment
+    waypoints: LineString
   ) {
     this.id = id;
     this.travelTime = travelTime;
     this.distance = distance;
     this.waypoints = waypoints;
-    this.startTime = startTime;
-    this.endTime = endTime;
   }
 
   get step(): Step | undefined {

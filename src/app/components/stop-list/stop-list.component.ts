@@ -17,6 +17,7 @@ export class StopListComponent implements OnInit {
 
   ngOnInit(): void {
     this.locationStore.locations$.subscribe(locations => {
+      console.log('location change')
       this.locations = locations.sort((a, b) => a.orderId > b.orderId ? 1 : -1);
     });
   }

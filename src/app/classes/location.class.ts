@@ -1,6 +1,7 @@
 import {Position} from 'geojson';
 import {Marker} from 'mapbox-gl';
 import {Moment} from 'moment';
+import * as moment from 'moment-timezone';
 import {MapService} from '../services/map.service';
 import {RouteService} from '../services/route.service';
 import {LocationStore} from '../store/location.store';
@@ -17,8 +18,8 @@ export class Location {
   coords: Position;
   marker?: Marker;
   orderId: number;
-  arriveTime: Moment;
-  leaveTime: Moment;
+  arriveTime!: Moment;
+  leaveTime!: Moment;
   pin: {
     icon: string,
     color: string
@@ -30,20 +31,17 @@ export class Location {
     coords: Position,
     orderId: number,
     icon: string = 'fa-mountain-city',
-    color: string = '#000',
-    arriveTime: Moment = TravelStore.instance.currentTravel!.start,
-    leaveTime: Moment = TravelStore.instance.currentTravel!.start,
+    color: string = '#000'
   ) {
     this.id = id;
     this.locationName = label;
     this.coords = coords;
-    this.arriveTime = arriveTime;
-    this.leaveTime = leaveTime;
     this.orderId = orderId;
     this.pin = {
       icon: icon,
       color: color
     };
+    this.calculateTimes();
   }
 
 
@@ -69,6 +67,19 @@ export class Location {
   }
 
 
+  calculateTimes = () => {
+    if(this.orderId === 0 || !this.route) {
+      this.arriveTime = moment(TravelStore.instance.currentTravel!.start);
+    } else {
+      this.arriveTime = moment(this.previousLocation!.leaveTime).add(this.route!.travelTime.asSeconds(), 'seconds')
+    }
+    const arriveTime = moment(this.arriveTime)
+    this.leaveTime = arriveTime.add(TravelStore.instance.currentTravel!.standardLocationDuration.asSeconds(), 'seconds')
+    // TODO: Tagesbeginn/Ende berücksichtigen
+
+  }
+
+
   buildRouteTo = (): Promise<true> => {
     console.log('Build Route for Location', this);
     console.log(this.previousLocation);
@@ -83,8 +94,8 @@ export class Location {
 
         RouteService.instance.getRouteBetweenLocations(this.previousLocation!, this).then((route: Route) => {
           route.save();
-          this.arriveTime = route.endTime;
-          this.leaveTime = route.endTime;
+          console.log(route);
+          this.calculateTimes();
           this.save();
 
           resolve(true);

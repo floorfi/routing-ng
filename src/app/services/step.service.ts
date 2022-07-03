@@ -32,6 +32,7 @@ export class StepService {
     return StepStore.instance.steps$.value.reduce((prev, curr) => prev.orderId < curr.orderId ? curr : prev).orderId + 1;
   }
 
+
   addStep = (result: MapboxLocation): void => {
     console.group('Add stop');
 
@@ -62,23 +63,36 @@ export class StepService {
     console.groupEnd();
   };
 
+
   removeStep = (stepId: string) => {
     const stepToRemove = this.stepStore.getStepById(stepId)!;
     const followingStep = stepToRemove.followingStep;
+    const previousStep = stepToRemove.previousStep;
 
     // Ggf. vorherige route entfernen
-    if (stepToRemove.previousStep) {
+    if (previousStep) {
       this.deleteEntriesBeforeStep(stepToRemove);
     }
 
-    stepToRemove.location.delete();
-    stepToRemove.delete();
-
-    console.log('Following step', followingStep);
-
-    // Gibt es einen Folgestep?
-    if (followingStep) {
-      followingStep.buildRouteTo();
+    // Es gibt einen Step vorher und nachher
+    if (previousStep && followingStep) {
+      stepToRemove.location.delete();
+      stepToRemove.delete();
+      followingStep.buildRouteTo().then(() => {
+        this.recalculateTimes();
+      });
+    }
+    // Erster Step der Route
+    else if(followingStep) {
+      this.deleteEntriesBeforeStep(followingStep!);
+      stepToRemove.location.delete();
+      stepToRemove.delete();
+      this.recalculateTimes();
+    }
+    // Letzter Step der Route
+    else {
+      stepToRemove.location.delete();
+      stepToRemove.delete();
     }
 
   }
@@ -99,6 +113,12 @@ export class StepService {
 
 
   recalculateTimes = () => {
-
+    console.log('Recalculate times')
+    const locations = this.locationStore.locations$.value.sort((a, b) => a.orderId > b.orderId ? 1 : -1);
+    locations.forEach((location, index) => {
+      if(index === 0) {
+        location.calculateTimes();
+      }
+    })
   };
 }

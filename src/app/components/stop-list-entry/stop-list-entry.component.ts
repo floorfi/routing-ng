@@ -5,6 +5,7 @@ import {Location} from '../../classes/location.class';
 import {Route} from '../../classes/route.class';
 import {Step} from '../../classes/step.class';
 import {StepService} from '../../services/step.service';
+import {LocationStore} from '../../store/location.store';
 import {RouteStore} from '../../store/route.store';
 import {StepStore} from '../../store/step.store';
 import {CustomModalComponent} from '../shared/custom-modal/custom-modal.component';
@@ -27,6 +28,7 @@ export class StopListEntryComponent implements OnInit {
     private stepService: StepService,
     private stepStore: StepStore,
     private routeStore: RouteStore,
+    private locationStore: LocationStore,
     private customModalService: CustomModalService
   ) {
   }
@@ -44,10 +46,6 @@ export class StopListEntryComponent implements OnInit {
     return this.routeStore.getRouteById(this.location.id)!;
   }
 
-  get arrivalMoment() {
-    return this.location.arriveTime.format('YYYY-MM-DDTHH:mm');
-  }
-
 
   get travelTime(): string {
     const seconds = this.route.travelTime;
@@ -60,22 +58,31 @@ export class StopListEntryComponent implements OnInit {
     return distanceInKm.toFixed(1);
   }
 
+  get arrivalMoment() {
+    return this.location.arriveTime.format('YYYY-MM-DDTHH:mm');
+  }
+
+
   set arrivalMoment(dateTime: string) {
     this.location.arriveTime = moment(dateTime);
   }
 
+
   get leaveMoment() {
-    return this.location.arriveTime.format('YYYY-MM-DDTHH:mm');
+    return this.location.leaveTime.format('YYYY-MM-DDTHH:mm');
   }
 
+
   set leaveMoment(dateTime: string) {
-    this.location.arriveTime = moment(dateTime);
+    this.location.leaveTime = moment(dateTime);
   }
+
 
   removeStep = () => {
     this.modalRef!.close();
     this.stepService.removeStep(this.step!.id);
   };
+
 
   openModal = () => {
     this.modalRef = this.customModalService.open(
@@ -87,10 +94,7 @@ export class StopListEntryComponent implements OnInit {
     );
 
     this.modalRef.buttonEvent.subscribe(() => {
-      if (this.step) {
-        this.step.save();
-      }
-      this.location.save();
+      this.save();
       this.modalRef!.close();
     });
   };
@@ -109,4 +113,19 @@ export class StopListEntryComponent implements OnInit {
       pinEl.classList.remove('text-slate-600');
     }
   };
+
+
+  save = () => {
+    const locationStoreEquivalent = this.locationStore.locations$.value.find(location => location.id === this.location.id)!
+    console.log('Location store equivalent', locationStoreEquivalent.leaveTime.format())
+    console.log('Location current', this.location.leaveTime.format())
+    // if(this.location.arriveTime !== locationStoreEquivalent.arriveTime || this.location.leaveTime !== locationStoreEquivalent.leaveTime) {
+      this.stepService.recalculateTimes();
+    // }
+
+    if (this.step) {
+      this.step.save();
+    }
+    this.location.save();
+  }
 }

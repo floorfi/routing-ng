@@ -1,5 +1,6 @@
 import {RouteService} from '../services/route.service';
 import {StepService} from '../services/step.service';
+import {LocationStore} from '../store/location.store';
 import {StepStore} from '../store/step.store';
 import {TravelStore} from '../store/travel.store';
 import {Location} from './location.class';
@@ -23,6 +24,7 @@ export class Step {
     this.orderId = orderId;
     this.location = location;
   }
+
 
   get previousStep(): Step | null {
     if (StepStore.instance.steps$.value.length === 0) return null;
@@ -64,8 +66,7 @@ export class Step {
             // TODO: Es wurde eine Komplexe Route geholt, diese noch vereinfachen: https://mourner.github.io/simplify-js/
 
             route.save();
-            this.location!.arriveTime = route.endTime;
-            this.location!.leaveTime = route.endTime;
+            this.location!.calculateTimes()
             this.location!.save();
             resolve(true);
           }
